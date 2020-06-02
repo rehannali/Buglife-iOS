@@ -689,8 +689,7 @@ void life_dispatch_async_to_main_queue(dispatch_block_t block) {
 
 - (void)reportViewController:(nonnull LIFEReportTableViewController *)reportViewController shouldCompleteReportBuilder:(nonnull LIFEReportBuilder *)reportBuilder completion:(void (^_Nullable)(BOOL finished))completion
 {
-//    [self reporter:nil shouldCompleteReportBuilder:reportBuilder completion:completion];
-    [self.delegate buglife:self reportBuilder:reportBuilder overrideSendingEmail:completion]
+    [self reporter:nil shouldCompleteReportBuilder:reportBuilder completion:completion];
 }
 
 #pragma mark - LIFEReporterDelegate
@@ -721,21 +720,33 @@ void life_dispatch_async_to_main_queue(dispatch_block_t block) {
     
     // TODO: build to something other than the main queue
     [reportBuilder buildReportToQueue:dispatch_get_main_queue() completion:^(LIFEReport *report) {
-        [self.dataProvider submitReport:report withRetryPolicy:retryPolicy completion:^(BOOL submittedSuccessfully) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) {
-                    completion(submittedSuccessfully);
-                }
-                
-                if (submittedSuccessfully) {
-                    [self _didCompleteReport:report];
-                    
-                    if (waitUntilSuccessfulSubmissionToDismissReporter) {
-                        [self _dismissReporterWithWindowBlindsAnimation:YES andShowThankYouDialog:YES];
-                    }
-                }
-            });
-        }];
+        [self.delegate buglife:self report:[report JSONDictionary]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) {
+                completion(YES);
+            }
+            
+            [self _didCompleteReport:report];
+            
+            if (waitUntilSuccessfulSubmissionToDismissReporter) {
+                [self _dismissReporterWithWindowBlindsAnimation:YES andShowThankYouDialog:YES];
+            }
+        });
+//        [self.dataProvider submitReport:report withRetryPolicy:retryPolicy completion:^(BOOL submittedSuccessfully) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                if (completion) {
+//                    completion(submittedSuccessfully);
+//                }
+//
+//                if (submittedSuccessfully) {
+//                    [self _didCompleteReport:report];
+//
+//                    if (waitUntilSuccessfulSubmissionToDismissReporter) {
+//                        [self _dismissReporterWithWindowBlindsAnimation:YES andShowThankYouDialog:YES];
+//                    }
+//                }
+//            });
+//        }];
     }];
     
     // Post this notification regardless of success of submission now; the attributes on the Buglife *now* will have been submitted eventually
