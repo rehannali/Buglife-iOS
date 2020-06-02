@@ -21,6 +21,7 @@
 #import "LIFEInputField.h"
 #import "LIFETextInputField.h"
 #import "LIFEPickerInputField.h"
+#import "LIFEReportBuilder.h"
 
 /**
  Options for automatically invocating the bug reporter view.
@@ -288,6 +289,8 @@ extern NSString * __nonnull const LIFEAttributeKeyJiraProjectKey;
  */
 @protocol BuglifeDelegate <NSObject>
 @optional
+
+- (void)buglife:(nonnull Buglife *)buglife reportBuilder:(nonnull LIFEReportBuilder *)reportBuilder overrideSendingEmail:(nonnull BOOL (^)(BOOL finished))completetionHandler;
 
 /**
  *  Buglife calls this method when the bug reporter is ready to accept attachments.

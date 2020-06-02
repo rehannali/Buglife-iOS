@@ -689,7 +689,8 @@ void life_dispatch_async_to_main_queue(dispatch_block_t block) {
 
 - (void)reportViewController:(nonnull LIFEReportTableViewController *)reportViewController shouldCompleteReportBuilder:(nonnull LIFEReportBuilder *)reportBuilder completion:(void (^_Nullable)(BOOL finished))completion
 {
-    [self reporter:nil shouldCompleteReportBuilder:reportBuilder completion:completion];
+//    [self reporter:nil shouldCompleteReportBuilder:reportBuilder completion:completion];
+    [self.delegate buglife:self reportBuilder:reportBuilder overrideSendingEmail:completion]
 }
 
 #pragma mark - LIFEReporterDelegate
